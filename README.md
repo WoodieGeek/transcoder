@@ -7,7 +7,7 @@ git config --global user.name "Ernest"
 
 git config --global credential.helper store
 
-git clone "repo"
+git clone https://github.com/WoodieGeek/transcoder.git
 
 git status
 git diff
