@@ -10,7 +10,11 @@ git config --global credential.helper store
 git clone https://github.com/WoodieGeek/transcoder.git
 
 git status
+
 git diff
+
 git add -u
+
 git commit -m "init"
+
 git push
