@@ -1,7 +1,7 @@
 # transcoder
 sudo apt-get install git
 
-git config --global user.email "shakir"
+git config --global user.email "shakirov@gmail.com"
 
 git config --global user.name "Ernest"
 
