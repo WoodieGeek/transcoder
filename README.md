@@ -1,7 +1,8 @@
 # transcoder
 sudo apt-get install git
 
-git config --global user.email "shakir
+git config --global user.email "shakir"
+
 git config --global user.name "Ernest"
 
 git config --global credential.helper store
