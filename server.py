@@ -1,6 +1,8 @@
+import flask
 from flask import Flask
 import json
 import os
+from flask import send_from_directory
 app = Flask(__name__)
 
 name = "map.json"
@@ -22,10 +24,13 @@ def upload_file(request):
     file.save(os.path.join(path_to_save, {filename : description_name}))
     
 
-@app.route('/play')
+@app.route('/play/<filename>')
 def play(filename):
-    if path.isfile(filename) == True:
-        return send_from_directory('storage/'+filename, filename)
+    if os.path.isfile('storage/' + filename) == True:
+        return send_from_directory('storage', filename)
+    else:
+        print("No such file")
+        return flask.make_response("404 not found", 404)
 
 
 if __name__ == "__main__":
