@@ -1,6 +1,9 @@
+
 from flask import Flask, request, make_response
+import flask
 import json
 import os
+from flask import send_from_directory
 app = Flask(__name__)
 
 name = "map.json"
@@ -9,7 +12,10 @@ name = "map.json"
 def get():
     json_file = open(name, 'r')
     videos_json = json.load(json_file)
-    return videos_json
+    
+    response = flask.make_response(videos_json)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 @app.route('/upload', methods=['POST'])
@@ -31,6 +37,18 @@ def upload_file():
     response = make_response("uploaded")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+    
+    
+
+@app.route('/play/<filename>')
+def play(filename):
+    if os.path.isfile('storage/' + filename) == True:
+        return send_from_directory('storage', filename)
+    else:
+        print("No such file")
+        return flask.make_response("404 not found", 404)
+
+    
 
 if __name__ == "__main__":
     app.run()
