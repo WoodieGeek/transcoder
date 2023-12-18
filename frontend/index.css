@@ -98,3 +98,15 @@ td {
     padding: 15px;
     border: 1px solid gray;
 }
+
+.table-link {
+    font-family: 'Limelight', cursive;
+    font-size: 18px;
+    color: rgb(210, 40, 0);
+    transition: 0.5s all;
+}
+
+.table-link:hover {
+    color: rgb(255, 85, 20);
+    transition: 0.5s all;
+}

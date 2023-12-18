@@ -13,11 +13,11 @@ async function buildTable() {
         alert("Ошибка HTTP: code " + response.status);
     }
 
-    $table.append('<tr> <td class = "main"> Name </td> <td class = "main"> Description </td> <td class = "main"> Preview </td> </tr>');
+    $table.append('<tr> <td class = "main"> Name </td> <td class = "main"> Description </td> <td class = "main"> Video </td> </tr>');
 
     data = data["videos"];
     for(var i = 0; i < data.length; ++i) {
-        $table.append('<tr> <td class = "name">' + data[i].name + '</td> <td class = "description">' + data[i].descriprion + '</td> <td> </td> </tr>');
+        $table.append('<tr> <td class = "name">' + data[i].name + '</td> <td class = "description">' + data[i].description + '</td> <td> <a href = ' + data[i].manifest_url + ' class = "table-link"> Link </a> </td> </tr>');
     }
 }
 
