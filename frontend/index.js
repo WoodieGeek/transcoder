@@ -17,7 +17,7 @@ async function buildTable() {
 
     data = data["videos"];
     for(var i = 0; i < data.length; ++i) {
-        $table.append('<tr> <td class = "name">' + data[i].name + '</td> <td class = "description">' + data[i].descriprion + '</td> <td> </td> </tr>');
+        $table.append('<tr> <td class = "name">' + data[i].name + '</td> <td class = "description">' + data[i].description + '</td> <td> </td> </tr>');
     }
 }
 
