@@ -1,0 +1,100 @@
+html {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    margin: 0;
+    min-width: 750px;
+}
+
+.title {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    font-size: 28px;
+    background-color: rgb(255, 85, 20);
+    color: white;
+    height: 50px;
+    padding: 10px;
+    padding-left: 0.3%;
+    min-width: 125px;
+    font-family: 'Limelight', cursive;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+}
+
+.load {
+    margin-left: auto;
+    margin-right: auto;
+    width: 150px;
+    font-size: 20px;
+    background-color: rgb(255, 85, 20);
+    color: white;
+    border-radius: 10px;
+    height: 30px;
+    padding: 10px;
+    padding-left: 0.3%;
+    margin-top: 15px; 
+    min-width: 125px;
+    font-family: 'Limelight', cursive;
+    text-align: center;
+    transition: 0.5s all;
+}
+
+.load:hover {
+    margin-left: auto;
+    margin-right: auto;
+    width: 150px;
+    font-size: 20px;
+    background-color: rgb(210, 40, 0);
+    color: white;
+    border-radius: 10px;
+    height: 30px;
+    padding: 10px;
+    padding-left: 0.3%;
+    margin-top: 15px; 
+    min-width: 125px;
+    font-family: 'Limelight', cursive;
+    text-align: center;
+    transition: 0.5s all;
+}
+
+.list-videos {
+    margin: 30px;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.main {
+    font-family: 'Limelight', cursive;
+    font-size: 18px;
+    color: black;
+    font-weight: bold;
+    background-color: rgb(255, 170, 140);
+}
+
+.name {
+    font-family: 'Limelight', cursive;
+    font-size: 18px;
+    color: black;
+}
+
+.description {
+    font-family: 'Limelight', cursive;
+    font-size: 14px;
+    color: gray;
+}
+
+td {
+    text-align: center;
+    padding: 15px;
+    border: 1px solid gray;
+}

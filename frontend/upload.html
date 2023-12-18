@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>upload</title>
+  <link href="upload.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <form>
+    <div>
+      <label type="text"> Video's title: </label>
+      <input name="title" />
+    </div>
+    <div>
+      <label>Description: </label>
+      <input type="text" name="description" />
+    </div>
+    <div>
+      <label>File: </label>
+      <input type="file" accept="video/*" name="file" />
+    </div>
+    <button onclick="location.href='index.html'" type="submit">Send your file</button>
+  </form>
+
+  <script src="upload.js"></script>
+  <script src="https://replit.com/public/js/replit-badge-v2.js" theme="dark" position="bottom-right"></script>
+</body>
+
+</html>
