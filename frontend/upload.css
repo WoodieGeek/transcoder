@@ -63,10 +63,6 @@ a {
     transition: 0.5s all;
 }
 
-.list-videos {
-    margin: 30px;
-}
-
 table {
     table-layout: fixed;
     width: 100%;
