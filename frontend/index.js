@@ -1,8 +1,8 @@
 var $table = $('.grains');
-// var grains = [];
+var grains = [];
 
 async function CallHTTP() { // DOESN'T WORK (at now)
-    let url = "some adress";
+    let url = "localhost:5000";
 
     let response = await fetch(url);
 
@@ -10,7 +10,7 @@ async function CallHTTP() { // DOESN'T WORK (at now)
         let text = response.text();
         let data = JSON.parse(text);
 
-        // grains = data;
+        grains = data;
     } else {
         alert("Ошибка HTTP: code " + response.status);
     }
@@ -18,24 +18,28 @@ async function CallHTTP() { // DOESN'T WORK (at now)
 
 CallHTTP();
 // TEST
-var grains = [
-    {
-        name: 'Cats',
-        desc: 'Some info...'
-        },
-    {
-        name: 'Dogs',
-        desc: 'Some info...'
-    },
-    {
-        name: 'Nature',
-        desc: 'Some info...'
-    }, 
-    {
-        name: 'Fruits',
-        desc: 'Some info...'
-    }
-];
+// var grains = [
+//     {
+//         name: 'Cats',
+//         desc: 'Some info...',
+//         manifestUrl: '?'
+//     },
+//     {
+//         name: 'Dogs',
+//         desc: 'Some info...',
+//         manifestUrl: '?'
+//     },
+//     {
+//         name: 'Nature',
+//         desc: 'Some info...',
+//         manifestUrl: '?'
+//     }, 
+//     {
+//         name: 'Fruits',
+//         desc: 'Some info...',
+//         manifestUrl: '?'
+//     }
+// ];
 // END TEST
 
 function buildTable() {
