@@ -20,8 +20,13 @@ def upload_file(request):
     description_name = description.filename
     path_to_save = name
     file.save(os.path.join(path_to_save, {filename : description_name}))
+    
+
+@app.route('/play')
+def play(filename):
+    if path.isfile(filename) == True:
+        return send_from_directory('storage/'+filename+'.mp4', filename)
 
 
 if __name__ == "__main__":
     app.run()
-
