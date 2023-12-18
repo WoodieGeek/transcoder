@@ -11,7 +11,10 @@ name = "map.json"
 def get():
     json_file = open(name, 'r')
     videos_json = json.load(json_file)
-    return videos_json
+    
+    response = flask.make_response(videos_json)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 @app.route('/upload')
