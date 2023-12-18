@@ -25,7 +25,7 @@ def upload_file(request):
 @app.route('/play')
 def play(filename):
     if path.isfile(filename) == True:
-        return send_from_directory('storage/'+filename+'.mp4', filename)
+        return send_from_directory('storage/'+filename, filename)
 
 
 if __name__ == "__main__":
