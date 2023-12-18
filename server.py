@@ -8,7 +8,7 @@ json_file = open('map.json', 'r')
 videos_json = json.load(json_file)
 
 
-@app.route("/video")
+@app.route("/videos")
 def get():
     return videos_json
 
