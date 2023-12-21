@@ -10,10 +10,15 @@ extern "C" {
 
 struct par{
     AVRational time_base;
-    int width, height;
+    int width=0, height=0;
     std::string codec_name;
     AVRational sample_aspect_ratio;
     AVPixelFormat pix_fmt;
+    int sample_rate;
+    int channel_layout;
+    int channels;
+    AVSampleFormat sample_fmt;
+
 };
 
 class Encoder{

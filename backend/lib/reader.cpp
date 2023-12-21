@@ -18,7 +18,7 @@ Reader::Reader(std::string file_name) {
         ensure(ret);
     }
     for (int i = 0; i < in_format_ctx->nb_streams; ++i) {
-        decoder_mas.emplace_back(in_format_ctx->streams[i]);
+        decoder_mas.emplace_back(new Decoder(in_format_ctx->streams[i]));
     }
 }
 
@@ -29,7 +29,8 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
     }
     int ret = av_read_frame(in_format_ctx, packet);
     if (ret < 0) return {{nullptr, 0}};
-    std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index].decode(packet, packet->stream_index);
+    std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index]->decode(packet, packet->stream_index);
+    av_packet_unref(packet);
     return get_frames;
 }
 

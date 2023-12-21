@@ -19,5 +19,5 @@ public:
 private:
     std::string file_name;
     AVFormatContext* in_format_ctx = nullptr;
-    std::vector<Decoder> decoder_mas;
+    std::vector<Decoder*> decoder_mas;
 };

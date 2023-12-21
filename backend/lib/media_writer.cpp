@@ -20,9 +20,10 @@ void MediaWriter::add_stream(AVStream *stream) {
     }
     newStream->time_base = stream->time_base;
 }
-void MediaWriter::write(AVPacket *packet, bool is_first_call) {
+void MediaWriter::write(AVPacket *packet) {
     int ret;
-    if (is_first_call) {
+    if (is_write_header) {
+        is_write_header = 0;
         ret = avio_open(&out_format_ctx->pb, Filename.data(), AVIO_FLAG_WRITE);
         if (ret < 0) {
             throw std::runtime_error("av open failed");
@@ -34,8 +35,8 @@ void MediaWriter::write(AVPacket *packet, bool is_first_call) {
         }
     }
 
-    av_packet_rescale_ts(packet, packet->time_base, out_format_ctx->streams[packet->stream_index]->time_base);
-    ret = av_write_frame(out_format_ctx, packet);
+    //av_packet_rescale_ts(packet, packet->time_base, out_format_ctx->streams[packet->stream_index]->time_base);
+    ret = av_interleaved_write_frame(out_format_ctx, packet);
     av_packet_unref(packet);
     if (ret < 0) {
         throw std::runtime_error("Error writing frame");
