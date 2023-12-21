@@ -6,12 +6,12 @@ Decoder::Decoder(AVStream* stream) {
 
     int response_key = avcodec_parameters_to_context(codec_context, stream -> codecpar);
     if (response_key < 0) {
-        throw std::runtime_error("Error of Decoder initialization process finished with incorrect exit code.");
+        throw std::runtime_error("Error of getting frame: process finished with incorrect exit code.");
     }
 
     response_key = avcodec_open2(codec_context, codec, nullptr);
     if (response_key < 0) {
-        throw std::runtime_error("Error of Decoder initialization: process finished with incorrect exit code.");
+        throw std::runtime_error("Error of getting frame: process finished with incorrect exit code.");
     }
 }
 

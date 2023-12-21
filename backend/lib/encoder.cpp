@@ -19,8 +19,6 @@ std::vector<AVPacket *> Encoder::encoder(AVFrame *Frame) {
         throw std::runtime_error("Error sending frame for encoding");
     }
 
-    std::cout << "FRAME_PTS: " << Frame->pts << std::endl;
-
 
     std::vector<AVPacket *> res;
     while (ret >= 0) {
@@ -36,7 +34,6 @@ std::vector<AVPacket *> Encoder::encoder(AVFrame *Frame) {
             throw std::runtime_error("Could not allocate AVPacket");
         }
         res.emplace_back(pkt);
-        std::cout << "PKT_PTS " << pkt->pts << std::endl;
     }
     return res;
 }

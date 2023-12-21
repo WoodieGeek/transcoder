@@ -12,6 +12,6 @@ public:
     AVFormatContext *out_format_ctx;
     MediaWriter(const std::string filename);
     void add_stream(AVStream *stream);
-    void write(AVPacket *packet);
+    void write(AVPacket *packet, bool is_first_call);
     void close();
 };
