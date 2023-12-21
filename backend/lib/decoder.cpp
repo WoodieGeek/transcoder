@@ -1,7 +1,7 @@
 #include "decoder.h"
 
 Decoder::Decoder(AVStream* stream) {
-    AVCodec* codec = avcodec_find_decoder(stream -> codecpar -> codec_id);
+    const AVCodec* codec = avcodec_find_decoder(stream -> codecpar -> codec_id);
     codec_context = avcodec_alloc_context3(codec);
 
     int response_key = avcodec_parameters_to_context(codec_context, stream -> codecpar);
