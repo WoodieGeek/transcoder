@@ -20,6 +20,6 @@ class Encoder{
 private:
     AVCodecContext *out_codec_ctx;
 public:
-    Encoder(par info);
+    *Encoder(par info);
     std::vector<AVPacket*> encoder(AVFrame *Frame);
 };

@@ -1,7 +1,7 @@
 #include "encoder.h"
 
 
-Encoder::Encoder(par info) {
+*Encoder::Encoder(par info) {
     const AVCodec *out_codec = avcodec_find_encoder_by_name(info.codec_name.c_str());
     out_codec_ctx = avcodec_alloc_context3(out_codec);
     out_codec_ctx->width = info.width;

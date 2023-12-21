@@ -15,14 +15,14 @@ Decoder::Decoder(AVStream* stream) {
     }
 }
 
-std::vector<AVFrame*> Decoder::decode(AVPacket* packet) {
+std::vector<std::pair<AVFrame*, int>> Decoder::decode(AVPacket* packet, int stream_index) {
     int response_key = avcodec_send_packet(codec_context, packet);
 
     if (response_key < 0) {
         throw std::runtime_error("Error of sending packet: process finished with incorrect exit code.");
     }
 
-    std::vector<AVFrame*> frame_list;
+    std::vector<std::pair<AVFrame*, int>> frame_list;
     while (response_key >= 0) {
         AVFrame* single_frame = av_frame_alloc();
         response_key = avcodec_receive_frame(codec_context, single_frame);
@@ -33,7 +33,7 @@ std::vector<AVFrame*> Decoder::decode(AVPacket* packet) {
             throw std::runtime_error("Error of getting frame: process finished with incorrect exit code.");
         }
 
-        frame_list.emplace_back(single_frame);
+        frame_list.emplace_back(single_frame, stream_index);
     }
 
     return frame_list;

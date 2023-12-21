@@ -22,7 +22,7 @@ Reader::Reader(std::string file_name) {
     }
 }
 
-std::vector<AVFrame*> Reader::ReadFrame() {
+std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
     AVPacket *packet = av_packet_alloc();
     if (!packet) {
         throw std::runtime_error("Could not allocate AVPacket");
@@ -32,7 +32,7 @@ std::vector<AVFrame*> Reader::ReadFrame() {
         std::cout << "Failded to read frame!\n";
         ensure(ret);
     }
-    std::vector<AVFrame*> get_frames = decoder_mas[packet->stream_index].decode(packet);
+    std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index].decode(packet, packet->stream_index);
     return get_frames;
 }
 
@@ -42,3 +42,6 @@ std::vector<AVStream*> Reader::GetStreams() {
         streams.push_back(in_format_ctx->streams[i]);
     return streams;
 }
+
+
+

@@ -24,6 +24,7 @@ void MediaWriter::write(AVPacket *packet) {
         throw std::runtime_error("Error writing frame");
     }
 }
+
 void MediaWriter::close() {
     av_write_trailer(out_format_ctx);
     avio_close(out_format_ctx->pb);
