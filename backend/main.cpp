@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
 
     std::vector<Encoder*> encoders((int)streams.size());
 
-    MediaWriter Writer(input_file);
+    MediaWriter Writer(output_file);
 
     for (AVStream* i : streams) {
         Writer.add_stream(i);
