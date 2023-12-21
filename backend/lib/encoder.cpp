@@ -1,7 +1,7 @@
 #include "encoder.h"
 
 
-Encoder::Encoder(par info) {
+*Encoder::Encoder(par info) {
     const AVCodec *out_codec = avcodec_find_encoder_by_name(info.codec_name.c_str());
     out_codec_ctx = avcodec_alloc_context3(out_codec);
     out_codec_ctx->width = info.width;
@@ -9,6 +9,10 @@ Encoder::Encoder(par info) {
     out_codec_ctx->time_base = info.time_base;
     out_codec_ctx->pix_fmt = info.pix_fmt;
     out_codec_ctx->sample_aspect_ratio = info.sample_aspect_ratio;
+    out_codec_ctx-> sample_rate = info.sample_rate;
+    out_codec_ctx->sample_fmt = info.sample_fmt;
+    out_codec_ctx->channels = info.channels;
+    out_codec_ctx->channel_layout = info.channel_layout;
     avcodec_open2(out_codec_ctx, out_codec, nullptr);
 }
 
@@ -18,8 +22,6 @@ std::vector<AVPacket *> Encoder::encoder(AVFrame *Frame) {
         std::cout << ret << std::endl;
         throw std::runtime_error("Error sending frame for encoding");
     }
-
-    std::cout << "FRAME_PTS: " << Frame->pts << std::endl;
 
 
     std::vector<AVPacket *> res;
@@ -36,7 +38,6 @@ std::vector<AVPacket *> Encoder::encoder(AVFrame *Frame) {
             throw std::runtime_error("Could not allocate AVPacket");
         }
         res.emplace_back(pkt);
-        std::cout << "PKT_PTS " << pkt->pts << std::endl;
     }
     return res;
 }

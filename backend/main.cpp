@@ -6,10 +6,12 @@ extern "C" {
 
 #include <iostream>
 #include <utility>
+
 #include "lib/encoder.h"
 #include "lib/decoder.h"
 #include "lib/reader.h"
 #include "lib/media_writer.h"
+
 
 static void save_frame(AVFrame* frame)
 {
