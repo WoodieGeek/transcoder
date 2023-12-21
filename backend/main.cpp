@@ -63,12 +63,5 @@ int main(int argc, char* argv[]) {
         for (AVPacket* pkt : pkt_to_writer) Writer.write(pkt);
     }
 
-    av_write_trailer(out_format_ctx);
-    avio_close(out_format_ctx->pb);
-    avformat_free_context(out_format_ctx);
-    avcodec_free_context(&in_codec_ctx);
-    avcodec_free_context(&out_codec_ctx);
-    avformat_close_input(&in_format_ctx);
-
     return 0;
 }
