@@ -16,5 +16,5 @@ private:
 
 public:
     Decoder(AVStream* stream);
-    std::vector<AVFrame*> decode(AVPacket* packet);
+    std::vector<std::pair<AVFrame*, int>> decode(AVPacket* packet, int stream_index);
 };

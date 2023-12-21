@@ -1,3 +1,4 @@
+#pragma once
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -13,7 +14,7 @@ public:
 
     Reader(std::string file_name_, int, int);
 
-    std::vector<AVFrame*> ReadFrame();
+    std::vector<std::pair<AVFrame*, int>> ReadFrame();
     std::vector<AVStream*> GetStreams();
     void Seek(int);
 private:
