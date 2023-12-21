@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     const char* input_file = "../test.mp4";
     const char* output_file = "../out.mp4";
 
-    Reader reader(input_file);
+    Reader reader(input_file, 0, 100);
     auto streams = reader.GetStreams();
 
     std::vector<Encoder*> encoders((int)streams.size());
@@ -74,8 +74,7 @@ int main(int argc, char* argv[]) {
             for (AVPacket *pkt: pkt_to_writer) {
                 std::cout << pkt->size << std::endl;
                 pkt->stream_index = 0;
-                if (is_first_call) Writer.write(pkt, 1), is_first_call = 0;
-                else Writer.write(pkt, 0);
+                Writer.write(pkt);
             }
 
         }
