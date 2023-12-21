@@ -24,8 +24,8 @@ Reader::Reader(std::string file_name, int l, int r): LEFT(l), RIGHT(r) {
         decoder_mas.emplace_back(in_format_ctx->streams[i]);
     }
 
-    stream_is_finished.resize(in_format_ctx->nb_streams, false);
-    cnt_finished_streams = 0;
+    stream_is_closed.resize(in_format_ctx->nb_streams, false);
+    cnt_closed_streams = 0;
 }
 
 std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
@@ -34,12 +34,12 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
         throw std::runtime_error("Could not allocate AVPacket");
     }
 
-    if (cnt_finished_streams == in_format_ctx->nb_streams) {
-        return {};
+    if (cnt_closed_streams == in_format_ctx->nb_streams) {
+        return {std::make_pair(nullptr, -1)};
     }
 
     int ret = av_read_frame(in_format_ctx, packet);
-    if (stream_is_finished[packet->stream_index]) {
+    if (stream_is_closed[packet->stream_index]) {
         return {};
     }
 
@@ -50,19 +50,34 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
 
     std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index].decode(packet, packet->stream_index);
 
+    auto begin = get_frames.begin();
     for (int i = 0; i < get_frames.size(); ++i) {
         auto& [frame, _] = get_frames[i];
+        if (frame->pts < av_rescale_q(LEFT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base)) {
+            ++begin;
+            continue;
+        }
+
         if (frame->pts > av_rescale_q(RIGHT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base)) {
             get_frames.resize(i);
 
-            stream_is_finished[packet->stream_index] = true;
-            ++cnt_finished_streams;
+            stream_is_closed[packet->stream_index] = true;
+            ++cnt_closed_streams;
 
             break;
         }
+
+        frame->pts -= av_rescale_q(LEFT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base);
+        // std::cout << frame->pts << " " << frame->pkt_dts << std::endl;
     }
 
-    return get_frames;
+    std::vector<std::pair<AVFrame*, int>> returning_frames;
+    returning_frames.reserve(get_frames.size());
+    for (auto it = begin; it < get_frames.end(); ++it) {
+        returning_frames.emplace_back(*it);
+    }
+
+    return returning_frames;
 }
 
 void Reader::Seek(int time) {

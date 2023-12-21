@@ -12,7 +12,7 @@ class Reader {
 public:
     void ensure(int error_id);
 
-    Reader(std::string file_name_, int, int);
+    Reader(std::string, int, int);
 
     std::vector<std::pair<AVFrame*, int>> ReadFrame();
     std::vector<AVStream*> GetStreams();
@@ -21,8 +21,9 @@ private:
     std::string file_name;
     AVFormatContext* in_format_ctx = nullptr;
     std::vector<Decoder> decoder_mas;
-    std::vector<bool> stream_is_finished;
-    int cnt_finished_streams;
+    std::vector<bool> stream_is_closed;
+    int cnt_closed_streams;
 
     int LEFT, RIGHT;
 };
+
