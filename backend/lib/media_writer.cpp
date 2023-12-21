@@ -1,11 +1,11 @@
 #include "media_writer.h"
 
 MediaWriter::MediaWriter(std::string filename) {
+    Filename = filename;
     int ret = avformat_alloc_output_context2(&out_format_ctx, nullptr, nullptr, filename.data());
     if (ret < 0) {
         throw std::runtime_error("Error allocating format context");
     }
-    avio_open(&out_format_ctx->pb, filename.data(), AVIO_FLAG_WRITE);
 }
 void MediaWriter::add_stream(AVStream *stream) {
     AVStream *newStream = avformat_new_stream(out_format_ctx, nullptr);
@@ -23,13 +23,20 @@ void MediaWriter::add_stream(AVStream *stream) {
 void MediaWriter::write(AVPacket *packet, bool is_first_call) {
     int ret;
     if (is_first_call) {
+        ret = avio_open(&out_format_ctx->pb, Filename.data(), AVIO_FLAG_WRITE);
+        if (ret < 0) {
+            throw std::runtime_error("av open failed");
+        }
+
         ret = avformat_write_header(out_format_ctx, nullptr);
         if (ret < 0) {
             throw std::runtime_error("Error writing header");
         }
     }
 
+    av_packet_rescale_ts(packet, packet->time_base, out_format_ctx->streams[packet->stream_index]->time_base);
     ret = av_write_frame(out_format_ctx, packet);
+    av_packet_unref(packet);
     if (ret < 0) {
         throw std::runtime_error("Error writing frame");
     }
