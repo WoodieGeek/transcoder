@@ -45,23 +45,41 @@ int main(int argc, char* argv[]) {
     MediaWriter Writer(output_file);
 
     for (AVStream* i : streams) {
+        if (i->index == 0) continue;
         Writer.add_stream(i);
 
         if (i->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            encoders[(int)i->index] = new Encoder({i->time_base, i->codecpar->width, i->codecpar->height, "libx264", i->sample_aspect_ratio, AV_PIX_FMT_YUV420P});
+            encoders[i->index] = new Encoder({i->time_base, i->codecpar->width, i->codecpar->height, "libx264", i->sample_aspect_ratio, AV_PIX_FMT_YUV420P});
         }
         if (i->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            encoders[i->index] = new Encoder({i->time_base, 0, 0, "libx264", i->sample_aspect_ratio, AV_PIX_FMT_YUV420P});
+            encoders[i->index] = new Encoder({i->time_base, 0, 0, "aac", i->sample_aspect_ratio, AV_PIX_FMT_YUV420P});
         }
     }
 
-    std::vector<std::pair<AVFrame*, int>> Frames = reader.ReadFrame();
+    int cnt = 0;
+    while (true) {
+        std::vector<std::pair<AVFrame *, int>> Frames = reader.ReadFrame();
 
+        if (Frames[0].first == nullptr) break;
 
-    for (std::pair<AVFrame*, int> i : Frames) {
-        std::vector<AVPacket *> pkt_to_writer = encoders[i.second]->encoder(i.first);
-        for (AVPacket* pkt : pkt_to_writer) Writer.write(pkt);
+        bool is_first_call = 1;
+        for (std::pair<AVFrame *, int> i: Frames) {
+            if (i.second == 0) continue;
+
+            ++cnt;
+            std::vector<AVPacket *> pkt_to_writer = encoders[i.second]->encoder(i.first);
+
+            for (AVPacket *pkt: pkt_to_writer) {
+                std::cout << pkt->size << std::endl;
+                pkt->stream_index = 0;
+                if (is_first_call) Writer.write(pkt, 1), is_first_call = 0;
+                else Writer.write(pkt, 0);
+            }
+
+        }
     }
 
+    Writer.close();
+    std::cout << cnt << '\n';
     return 0;
 }
