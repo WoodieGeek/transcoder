@@ -24,8 +24,8 @@ Reader::Reader(std::string file_name, int l, int r): LEFT(l), RIGHT(r) {
         decoder_mas.emplace_back(in_format_ctx->streams[i]);
     }
 
-    stream_is_finished.resize(in_format_ctx->nb_streams, false);
-    cnt_finished_streams = 0;
+    stream_is_closed.resize(in_format_ctx->nb_streams, false);
+    cnt_closed_streams = 0;
 }
 
 std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
@@ -34,12 +34,12 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
         throw std::runtime_error("Could not allocate AVPacket");
     }
 
-    if (cnt_finished_streams == in_format_ctx->nb_streams) {
+    if (cnt_closed_streams == in_format_ctx->nb_streams) {
         return {};
     }
 
     int ret = av_read_frame(in_format_ctx, packet);
-    if (stream_is_finished[packet->stream_index]) {
+    if (stream_is_closed[packet->stream_index]) {
         return {};
     }
 
@@ -55,11 +55,13 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
         if (frame->pts > av_rescale_q(RIGHT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base)) {
             get_frames.resize(i);
 
-            stream_is_finished[packet->stream_index] = true;
-            ++cnt_finished_streams;
+            stream_is_closed[packet->stream_index] = true;
+            ++cnt_closed_streams;
 
             break;
         }
+
+        frame->pts -= av_rescale_q(LEFT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base);
     }
 
     return get_frames;
@@ -82,6 +84,3 @@ std::vector<AVStream*> Reader::GetStreams() {
 
     return streams;
 }
-
-
-
