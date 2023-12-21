@@ -6,7 +6,7 @@ void Reader::ensure(int error_id) {
 }
 
 
-Reader::Reader(std::string file_name) {
+Reader::Reader(std::string file_name, int l, int r): LEFT(l), RIGHT(r) {
     int ret = avformat_open_input(&in_format_ctx, file_name.c_str(), nullptr, nullptr);
     if (ret < 0) {
         std::cout << "Failed to open input file " << file_name << "!\n";
