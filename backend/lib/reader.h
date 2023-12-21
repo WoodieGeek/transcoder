@@ -16,14 +16,14 @@ public:
 
     std::vector<std::pair<AVFrame*, int>> ReadFrame();
     std::vector<AVStream*> GetStreams();
-    void Seek(int);
 private:
     std::string file_name;
     AVFormatContext* in_format_ctx = nullptr;
-    std::vector<Decoder> decoder_mas;
+
     std::vector<bool> stream_is_closed;
     int cnt_closed_streams;
 
     int LEFT, RIGHT;
+    std::vector<Decoder*> decoder_mas;
 };
 
