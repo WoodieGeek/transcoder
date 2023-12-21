@@ -6,12 +6,10 @@ extern "C" {
 
 #include <iostream>
 #include <utility>
-
-#include "lib/encoder.h"
-#include "lib/decoder.h"
-#include "lib/reader.h"
-#include "lib/media_writer.h"
-
+#include "encoder.h"
+#include "decoder.h"
+#include "reader.h"
+#include "media_writer.h"
 
 static void save_frame(AVFrame* frame)
 {
@@ -34,12 +32,13 @@ static void save_frame(AVFrame* frame)
     fclose(f);
 }
 
+const char* input_file = "../test.mp4";
+const char* output_file = "../out.mp4";
+
+
 int main(int argc, char* argv[]) {
 
-    const char* input_file = "../test.mp4";
-    const char* output_file = "../out.mp4";
-
-    Reader reader(input_file, 0, 100);
+    Reader reader(input_file);
     auto streams = reader.GetStreams();
 
     std::vector<Encoder*> encoders((int)streams.size());
@@ -47,40 +46,53 @@ int main(int argc, char* argv[]) {
     MediaWriter Writer(output_file);
 
     for (AVStream* i : streams) {
-        if (i->index == 0) continue;
         Writer.add_stream(i);
 
+        par codec_options;
+        codec_options.time_base = i->time_base;
+        codec_options.sample_aspect_ratio = i->sample_aspect_ratio;
+        codec_options.pix_fmt = AV_PIX_FMT_YUV420P;
+        codec_options.sample_rate = i->codecpar->sample_rate;
+        codec_options.channels = i->codecpar->ch_layout.nb_channels;
+        codec_options.channel_layout = AV_CH_LAYOUT_STEREO;
+        codec_options.sample_fmt = (AVSampleFormat)i->codecpar->format;
         if (i->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            encoders[i->index] = new Encoder({i->time_base, i->codecpar->width, i->codecpar->height, "libx264", i->sample_aspect_ratio, AV_PIX_FMT_YUV420P});
+            codec_options.width = i->codecpar->width;
+            codec_options.height = i->codecpar->height;
+            codec_options.codec_name = "libx264";
+            encoders[i->index] = new Encoder(codec_options);
         }
         if (i->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            encoders[i->index] = new Encoder({i->time_base, 0, 0, "aac", i->sample_aspect_ratio, AV_PIX_FMT_YUV420P});
+            codec_options.codec_name = "aac";
+            encoders[i->index] = new Encoder(codec_options);
         }
     }
 
-    int cnt = 0;
     while (true) {
         std::vector<std::pair<AVFrame *, int>> Frames = reader.ReadFrame();
 
         if (Frames[0].first == nullptr) break;
 
-        bool is_first_call = 1;
         for (std::pair<AVFrame *, int> i: Frames) {
-            if (i.second == 0) continue;
-
-            ++cnt;
+//            if (i.second == 0) continue;
             std::vector<AVPacket *> pkt_to_writer = encoders[i.second]->encoder(i.first);
 
             for (AVPacket *pkt: pkt_to_writer) {
-                std::cout << pkt->size << std::endl;
-                pkt->stream_index = 0;
-                Writer.write(pkt);
-            }
+                pkt->stream_index = i.second;
 
+                Writer.write(pkt);
+                av_packet_unref(pkt);
+            }
+            av_frame_unref(i.first);
         }
+    }
+    auto mas = encoders[1]->encoder(nullptr);
+    for (AVPacket *pkt: mas) {
+        pkt->stream_index = 0;
+        Writer.write(pkt);
+        av_packet_unref(pkt);
     }
 
     Writer.close();
-    std::cout << cnt << '\n';
     return 0;
 }
