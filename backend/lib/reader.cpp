@@ -51,7 +51,7 @@ std::vector<AVFrame*> Reader::ReadFrame() {
     std::vector<AVFrame*> get_frames = decoder_mas[packet->stream_index].decode(packet);
 
     for (int i = 0; i < get_frames.size(); ++i) {
-        if (get_frames[i]->pts > RIGHT) {
+        if (get_frames[i]->pts > av_rescale_q(RIGHT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base)) {
             get_frames.resize(i);
 
             stream_is_finished[packet->stream_index] = true;
