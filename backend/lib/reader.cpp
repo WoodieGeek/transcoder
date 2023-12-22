@@ -45,7 +45,7 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
         ensure(ret);
     }
 
-    std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index].decode(packet, packet->stream_index);
+    std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index]->decode(packet, packet->stream_index);
 
     auto begin = get_frames.begin();
     for (int i = 0; i < get_frames.size(); ++i) {
