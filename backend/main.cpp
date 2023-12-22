@@ -30,15 +30,17 @@ static void save_frame(AVFrame* frame) {
 }
 
 int main(int argc, char* argv[]) {
+    if (argc < 5) {
+        assert(false);
+    }
+
     std::vector<std::string> arg_mas;
-    for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]);
-    arg_mas[0] = "../../../storage/" + arg_mas[0];
-    arg_mas[1] = "../../../storage/" + arg_mas[1];
+    for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]), std::cout << arg_mas[i] << std::endl;
 
-    const char* input_file = arg_mas[0].c_str();
-    const char* output_file = arg_mas[1].c_str();
+    const char* input_file = arg_mas[1].c_str();
+    const char* output_file = arg_mas[2].c_str();
 
-    Reader reader(input_file, stoi(arg_mas[2]), stoi(arg_mas[3]));
+    Reader reader(input_file, stoi(arg_mas[3]), stoi(arg_mas[4]));
     auto streams = reader.GetStreams();
 
     std::vector<Encoder*> encoders((int)streams.size());
