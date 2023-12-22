@@ -11,3 +11,14 @@ backend/lib/origin.cpp
 storage
 backend/test.mp4
 backend/out.mp4
+backend/CMakeCache.txt
+backend/CMakeFiles/
+backend/Makefile
+backend/cmake_install.cmake
+backend/flaskProject/
+backend/lib/CMakeFiles/
+backend/lib/CMakeLists.txt
+backend/lib/Makefile
+backend/lib/cmake_install.cmake
+backend/lib/liblib.a
+backend/main
