@@ -10,9 +10,7 @@ extern "C" {
 #include "lib/reader.h"
 #include "lib/media_writer.h"
 
-static void save_frame(AVFrame* frame)
-{
-
+static void save_frame(AVFrame* frame) {
     unsigned char *buf = (unsigned char*)frame->data[0];
     int wrap = frame->linesize[0];
     int xs = frame->width;
@@ -32,7 +30,6 @@ static void save_frame(AVFrame* frame)
 }
 
 int main(int argc, char* argv[]) {
-
     std::vector<std::string> arg_mas;
     for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]);
     arg_mas[0] = "../../../storage/" + arg_mas[0];
@@ -56,7 +53,7 @@ int main(int argc, char* argv[]) {
         codec_options.sample_aspect_ratio = i->sample_aspect_ratio;
         codec_options.pix_fmt = AV_PIX_FMT_YUV420P;
         codec_options.sample_rate = i->codecpar->sample_rate;
-        codec_options.channels = i->codecpar->ch_layout.nb_channels;
+        codec_options.channels = 2;
         codec_options.channel_layout = AV_CH_LAYOUT_STEREO;
         codec_options.sample_fmt = (AVSampleFormat)i->codecpar->format;
         if (i->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -72,12 +69,15 @@ int main(int argc, char* argv[]) {
     }
 
     while (true) {
-        std::vector<std::pair<AVFrame *, int>> Frames = reader.ReadFrame();
+        std::vector<std::pair<AVFrame*, int>> Frames = reader.ReadFrame();
 
+        if (Frames.empty()) continue;
         if (Frames[0].first == nullptr) break;
 
-        for (std::pair<AVFrame *, int> i: Frames) {
-            std::vector<AVPacket *> pkt_to_writer = encoders[i.second]->encoder(i.first);
+        for (std::pair<AVFrame*, int> i: Frames) {
+
+//          if (i.second == 0) continue;
+            std::vector<AVPacket*> pkt_to_writer = encoders[i.second]->encoder(i.first);
 
             for (AVPacket *pkt: pkt_to_writer) {
                 pkt->stream_index = i.second;
@@ -85,6 +85,7 @@ int main(int argc, char* argv[]) {
                 Writer.write(pkt);
                 av_packet_unref(pkt);
             }
+
             av_frame_unref(i.first);
         }
     }
@@ -96,7 +97,6 @@ int main(int argc, char* argv[]) {
             Writer.write(pkt);
         }
     }
-
 
     Writer.close();
     return 0;
