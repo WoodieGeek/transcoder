@@ -1,7 +1,6 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-//#include <libswscale/swscale.h>
 }
 
 #include <iostream>
@@ -32,13 +31,12 @@ static void save_frame(AVFrame* frame)
     fclose(f);
 }
 
-const char* input_file = "test.mp4";
-const char* output_file = "out.mp4";
-
+const char* input_file = "../../test.mp4";
+const char* output_file = "../../out.mp4";
 
 int main(int argc, char* argv[]) {
 
-    Reader reader(input_file);
+    Reader reader(input_file, 0, 100);
     auto streams = reader.GetStreams();
 
     std::vector<Encoder*> encoders((int)streams.size());
@@ -93,6 +91,7 @@ int main(int argc, char* argv[]) {
             Writer.write(pkt);
         }
     }
+
 
     Writer.close();
     return 0;
