@@ -6,10 +6,10 @@ extern "C" {
 
 #include <iostream>
 #include <utility>
-#include "encoder.h"
-#include "decoder.h"
-#include "reader.h"
-#include "media_writer.h"
+#include "lib/encoder.h"
+#include "lib/decoder.h"
+#include "lib/reader.h"
+#include "lib/media_writer.h"
 
 static void save_frame(AVFrame* frame)
 {
@@ -32,8 +32,8 @@ static void save_frame(AVFrame* frame)
     fclose(f);
 }
 
-const char* input_file = "../test.mp4";
-const char* output_file = "../out.mp4";
+const char* input_file = "test.mp4";
+const char* output_file = "out.mp4";
 
 
 int main(int argc, char* argv[]) {
@@ -74,7 +74,6 @@ int main(int argc, char* argv[]) {
         if (Frames[0].first == nullptr) break;
 
         for (std::pair<AVFrame *, int> i: Frames) {
-//            if (i.second == 0) continue;
             std::vector<AVPacket *> pkt_to_writer = encoders[i.second]->encoder(i.first);
 
             for (AVPacket *pkt: pkt_to_writer) {
@@ -86,11 +85,13 @@ int main(int argc, char* argv[]) {
             av_frame_unref(i.first);
         }
     }
-    auto mas = encoders[1]->encoder(nullptr);
-    for (AVPacket *pkt: mas) {
-        pkt->stream_index = 0;
-        Writer.write(pkt);
-        av_packet_unref(pkt);
+
+    for (int i = 0; i < (int)streams.size(); ++i) {
+        auto mas = encoders[i]->encoder(nullptr);
+        for (AVPacket *pkt: mas) {
+            pkt->stream_index = i;
+            Writer.write(pkt);
+        }
     }
 
     Writer.close();

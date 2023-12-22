@@ -5,4 +5,8 @@ server.py.tmp
 backend/.idea/
 backend/CMakeLists.txt
 cmake-build-debug
+backend/cpp_proj
+backend/test.mp4
+backend/lib/origin.cpp
+storage
 
