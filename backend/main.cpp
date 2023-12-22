@@ -1,6 +1,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
 }
 
 #include <iostream>
@@ -9,6 +10,15 @@ extern "C" {
 #include "lib/decoder.h"
 #include "lib/reader.h"
 #include "lib/media_writer.h"
+#include "lib/scale.h"
+
+const std::string input_file = "../in.mp4";
+const char* output_file = "../out.mp4";
+
+void ensure(int error_id) {
+    char str[AV_ERROR_MAX_STRING_SIZE];
+    throw std::runtime_error(av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, error_id));
+}
 
 static void save_frame(AVFrame* frame) {
     unsigned char *buf = (unsigned char*)frame->data[0];
@@ -30,43 +40,42 @@ static void save_frame(AVFrame* frame) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 5) {
-        assert(false);
-    }
+    const int time_start = 0, time_end = 10;
 
-    std::vector<std::string> arg_mas;
-    for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]), std::cout << arg_mas[i] << std::endl;
+    Reader reader(input_file, time_start, time_end);
 
-    const char* input_file = arg_mas[1].c_str();
-    const char* output_file = arg_mas[2].c_str();
-
-    Reader reader(input_file, stoi(arg_mas[3]), stoi(arg_mas[4]));
     auto streams = reader.GetStreams();
 
-    std::vector<Encoder*> encoders((int)streams.size());
+    std::map<int, Encoder*> encoders;
+    std::map<int, Scaler*> scalers;
 
     MediaWriter Writer(output_file);
 
-    for (AVStream* i : streams) {
-        Writer.add_stream(i);
+    for (int i = 0; i < streams.size(); ++i) {
+        auto stream = streams[i];
+        Writer.add_stream(stream);
 
         par codec_options;
-        codec_options.time_base = i->time_base;
-        codec_options.sample_aspect_ratio = i->sample_aspect_ratio;
+        codec_options.time_base = stream->time_base;
+        codec_options.sample_aspect_ratio = stream->sample_aspect_ratio;
         codec_options.pix_fmt = AV_PIX_FMT_YUV420P;
-        codec_options.sample_rate = i->codecpar->sample_rate;
+        codec_options.sample_rate = stream->codecpar->sample_rate;
         codec_options.channels = 2;
         codec_options.channel_layout = AV_CH_LAYOUT_STEREO;
-        codec_options.sample_fmt = (AVSampleFormat)i->codecpar->format;
-        if (i->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            codec_options.width = i->codecpar->width;
-            codec_options.height = i->codecpar->height;
+        codec_options.sample_fmt = (AVSampleFormat)stream->codecpar->format;
+
+        if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            codec_options.width = 256;
+            codec_options.height = 144;
             codec_options.codec_name = "libx264";
-            encoders[i->index] = new Encoder(codec_options);
+
+            encoders[stream->index] = new Encoder(codec_options);
+            scalers[i] = new Scaler(stream, 256, 144);
         }
-        if (i->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+
+        if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             codec_options.codec_name = "aac";
-            encoders[i->index] = new Encoder(codec_options);
+            encoders[stream->index] = new Encoder(codec_options);
         }
     }
 
@@ -76,19 +85,27 @@ int main(int argc, char* argv[]) {
         if (Frames.empty()) continue;
         if (Frames[0].first == nullptr) break;
 
-        for (std::pair<AVFrame*, int> i: Frames) {
+        for (std::pair<AVFrame*, int> frame: Frames) {
+            AVFrame* ready_frame = av_frame_alloc();
+
+            if (scalers.count(frame.second)) {
+                ready_frame = scalers[frame.second]->ScaleFrame(frame.first);
+            } else {
+                ready_frame = frame.first;
+            }
 
 //          if (i.second == 0) continue;
-            std::vector<AVPacket*> pkt_to_writer = encoders[i.second]->encoder(i.first);
+            std::vector<AVPacket*> pkt_to_writer = encoders[frame.second]->encoder(ready_frame);
 
             for (AVPacket *pkt: pkt_to_writer) {
-                pkt->stream_index = i.second;
+                pkt->stream_index = frame.second;
 
                 Writer.write(pkt);
                 av_packet_unref(pkt);
             }
 
-            av_frame_unref(i.first);
+            av_frame_unref(frame.first);
+            av_frame_unref(ready_frame);
         }
     }
 

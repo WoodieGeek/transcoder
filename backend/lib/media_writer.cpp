@@ -15,9 +15,6 @@ void MediaWriter::add_stream(AVStream *stream) {
         throw std::runtime_error("Error in writer");
     }
 
-    if (!newStream) {
-        throw std::runtime_error("Error adding new stream");
-    }
     newStream->time_base = stream->time_base;
 }
 void MediaWriter::write(AVPacket *packet) {

@@ -1,8 +1,19 @@
-//
-// Created by raystelle on 22.12.23.
-//
+#pragma once
 
-#ifndef DECODERCLASS_SCALE_H
-#define DECODERCLASS_SCALE_H
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+}
 
-#endif //DECODERCLASS_SCALE_H
+#include <stdexcept>
+
+class Scaler {
+public:
+    Scaler(AVStream*, int, int, AVPixelFormat = AV_PIX_FMT_YUV420P);
+    AVFrame* ScaleFrame(AVFrame*, AVPixelFormat = AV_PIX_FMT_YUV420P);
+
+private:
+    struct SwsContext* resize_context;
+    int out_width, out_height;
+};
