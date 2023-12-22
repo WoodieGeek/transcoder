@@ -45,13 +45,13 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
         ensure(ret);
     }
 
-    std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index].decode(packet, packet->stream_index);
+    std::vector<std::pair<AVFrame*, int>> get_frames = decoder_mas[packet->stream_index]->decode(packet, packet->stream_index);
 
-    auto begin = get_frames.begin();
+    int start = 0;
     for (int i = 0; i < get_frames.size(); ++i) {
         auto& [frame, _] = get_frames[i];
         if (frame->pts < av_rescale_q(LEFT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base)) {
-            ++begin;
+            ++start;
             continue;
         }
 
@@ -65,13 +65,15 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
         }
 
         frame->pts -= av_rescale_q(LEFT * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[packet->stream_index]->time_base);
-        // std::cout << frame->pts << " " << frame->pkt_dts << std::endl;
+        // std::cout << frame->pts << " " << (double)frame->pts / AV_TIME_BASE << std::endl;
     }
 
     std::vector<std::pair<AVFrame*, int>> returning_frames;
     returning_frames.reserve(get_frames.size());
-    for (auto it = begin; it < get_frames.end(); ++it) {
-        returning_frames.emplace_back(*it);
+
+    for (int i = start; i < get_frames.size(); ++i) {
+        get_frames[i].first->key_frame = 1;
+        returning_frames.emplace_back(get_frames[i]);
     }
 
     return returning_frames;

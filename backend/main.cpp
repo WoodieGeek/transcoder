@@ -6,14 +6,12 @@ extern "C" {
 
 #include <iostream>
 #include <utility>
-#include "encoder.h"
-#include "decoder.h"
-#include "reader.h"
-#include "media_writer.h"
+#include "gt/transcoder/backend/lib/encoder.h"
+#include "gt/transcoder/backend/lib/decoder.h"
+#include "gt/transcoder/backend/lib/reader.h"
+#include "gt/transcoder/backend/lib/media_writer.h"
 
-static void save_frame(AVFrame* frame)
-{
-
+static void save_frame(AVFrame* frame) {
     unsigned char *buf = (unsigned char*)frame->data[0];
     int wrap = frame->linesize[0];
     int xs = frame->width;
@@ -32,13 +30,13 @@ static void save_frame(AVFrame* frame)
     fclose(f);
 }
 
-const char* input_file = "../test.mp4";
+const std::string input_file = "../in.mp4";
 const char* output_file = "../out.mp4";
 
-
 int main(int argc, char* argv[]) {
+    const int time_start = 5, time_end = 6;
 
-    Reader reader(input_file);
+    Reader reader(input_file, time_start, time_end);
     auto streams = reader.GetStreams();
 
     std::vector<Encoder*> encoders((int)streams.size());
@@ -53,7 +51,7 @@ int main(int argc, char* argv[]) {
         codec_options.sample_aspect_ratio = i->sample_aspect_ratio;
         codec_options.pix_fmt = AV_PIX_FMT_YUV420P;
         codec_options.sample_rate = i->codecpar->sample_rate;
-        codec_options.channels = i->codecpar->ch_layout.nb_channels;
+        codec_options.channels = 2;
         codec_options.channel_layout = AV_CH_LAYOUT_STEREO;
         codec_options.sample_fmt = (AVSampleFormat)i->codecpar->format;
         if (i->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -69,12 +67,13 @@ int main(int argc, char* argv[]) {
     }
 
     while (true) {
-        std::vector<std::pair<AVFrame *, int>> Frames = reader.ReadFrame();
+        std::vector<std::pair<AVFrame*, int>> Frames = reader.ReadFrame();
 
+        if (Frames.empty()) continue;
         if (Frames[0].first == nullptr) break;
 
         for (std::pair<AVFrame *, int> i: Frames) {
-//            if (i.second == 0) continue;
+//          if (i.second == 0) continue;
             std::vector<AVPacket *> pkt_to_writer = encoders[i.second]->encoder(i.first);
 
             for (AVPacket *pkt: pkt_to_writer) {
@@ -86,11 +85,13 @@ int main(int argc, char* argv[]) {
             av_frame_unref(i.first);
         }
     }
-    auto mas = encoders[1]->encoder(nullptr);
-    for (AVPacket *pkt: mas) {
-        pkt->stream_index = 0;
-        Writer.write(pkt);
-        av_packet_unref(pkt);
+
+    for (int i = 0; i < (int)streams.size(); ++i) {
+        auto mas = encoders[i]->encoder(nullptr);
+        for (AVPacket *pkt: mas) {
+            pkt->stream_index = i;
+            Writer.write(pkt);
+        }
     }
 
     Writer.close();
