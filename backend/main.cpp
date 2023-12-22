@@ -12,9 +12,6 @@ extern "C" {
 #include "lib/media_writer.h"
 #include "lib/scale.h"
 
-const std::string input_file = "../in.mp4";
-const char* output_file = "../out.mp4";
-
 void ensure(int error_id) {
     char str[AV_ERROR_MAX_STRING_SIZE];
     throw std::runtime_error(av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, error_id));
@@ -39,10 +36,39 @@ static void save_frame(AVFrame* frame) {
     fclose(f);
 }
 
-int main(int argc, char* argv[]) {
-    const int time_start = 0, time_end = 10;
+void defineResolutions(std::map<std::string, std::pair<int, int>> &resolutions) {
+    resolutions["144p"] = {256, 144};
+    resolutions["240p"] = {426, 240};
+    resolutions["360p"] = {640, 360};
+    resolutions["480p"] = {854, 480};
+    resolutions["720p"] = {1280, 720};
+    resolutions["1080p"] = {1920, 1080};
+    resolutions["1440p"] = {2560, 1440};
+    resolutions["2160p"] = {3840, 2160};
+    resolutions["4320p"] = {7680, 4320};
+}
 
-    Reader reader(input_file, time_start, time_end);
+int main(int argc, char* argv[]) {
+    std::map<std::string, std::pair<int, int>> resolutions;
+    defineResolutions(resolutions);
+
+    if (argc < 6) {
+        throw std::runtime_error("Too few arg for main.");
+    }
+
+    std::vector<std::string> arg_mas;
+    for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]), std::cout << arg_mas[i] << std::endl;
+
+    const char* input_file = arg_mas[1].c_str();
+    const char* output_file = arg_mas[2].c_str();
+
+    Reader reader(input_file, stoi(arg_mas[3]), stoi(arg_mas[4]));
+
+    if (!resolutions.count(arg_mas[5])) {
+        throw std::runtime_error("Incorrect resolution provided.");
+    }
+
+    auto width = resolutions[arg_mas[5]].first, height = resolutions[arg_mas[5]].second;
 
     auto streams = reader.GetStreams();
 
@@ -65,12 +91,12 @@ int main(int argc, char* argv[]) {
         codec_options.sample_fmt = (AVSampleFormat)stream->codecpar->format;
 
         if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            codec_options.width = 256;
-            codec_options.height = 144;
+            codec_options.width = width;
+            codec_options.height = height;
             codec_options.codec_name = "libx264";
 
             encoders[stream->index] = new Encoder(codec_options);
-            scalers[i] = new Scaler(stream, 256, 144);
+            scalers[i] = new Scaler(stream, width, height);
         }
 
         if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
