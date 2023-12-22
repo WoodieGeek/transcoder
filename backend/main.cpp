@@ -1,15 +1,14 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-//#include <libswscale/swscale.h>
 }
 
 #include <iostream>
 #include <utility>
-#include "gt/transcoder/backend/lib/encoder.h"
-#include "gt/transcoder/backend/lib/decoder.h"
-#include "gt/transcoder/backend/lib/reader.h"
-#include "gt/transcoder/backend/lib/media_writer.h"
+#include "lib/encoder.h"
+#include "lib/decoder.h"
+#include "lib/reader.h"
+#include "lib/media_writer.h"
 
 static void save_frame(AVFrame* frame) {
     unsigned char *buf = (unsigned char*)frame->data[0];
@@ -30,13 +29,15 @@ static void save_frame(AVFrame* frame) {
     fclose(f);
 }
 
+
 const std::string input_file = "../in.mp4";
 const char* output_file = "../out.mp4";
 
 int main(int argc, char* argv[]) {
-    const int time_start = 5, time_end = 6;
+    const int time_start = 0, time_end = 10;
 
     Reader reader(input_file, time_start, time_end);
+
     auto streams = reader.GetStreams();
 
     std::vector<Encoder*> encoders((int)streams.size());
@@ -72,9 +73,10 @@ int main(int argc, char* argv[]) {
         if (Frames.empty()) continue;
         if (Frames[0].first == nullptr) break;
 
-        for (std::pair<AVFrame *, int> i: Frames) {
+        for (std::pair<AVFrame*, int> i: Frames) {
+
 //          if (i.second == 0) continue;
-            std::vector<AVPacket *> pkt_to_writer = encoders[i.second]->encoder(i.first);
+            std::vector<AVPacket*> pkt_to_writer = encoders[i.second]->encoder(i.first);
 
             for (AVPacket *pkt: pkt_to_writer) {
                 pkt->stream_index = i.second;
@@ -82,6 +84,7 @@ int main(int argc, char* argv[]) {
                 Writer.write(pkt);
                 av_packet_unref(pkt);
             }
+
             av_frame_unref(i.first);
         }
     }
