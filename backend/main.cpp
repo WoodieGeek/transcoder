@@ -31,12 +31,17 @@ static void save_frame(AVFrame* frame)
     fclose(f);
 }
 
-const char* input_file = "../../test.mp4";
-const char* output_file = "../../out.mp4";
-
 int main(int argc, char* argv[]) {
 
-    Reader reader(input_file, 0, 100);
+    std::vector<std::string> arg_mas;
+    for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]);
+    arg_mas[0] = "../../../storage/" + arg_mas[0];
+    arg_mas[1] = "../../../storage/" + arg_mas[1];
+
+    const char* input_file = arg_mas[0].c_str();
+    const char* output_file = arg_mas[1].c_str();
+
+    Reader reader(input_file, stoi(arg_mas[2]), stoi(arg_mas[3]));
     auto streams = reader.GetStreams();
 
     std::vector<Encoder*> encoders((int)streams.size());
