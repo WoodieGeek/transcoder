@@ -17,25 +17,6 @@ void ensure(int error_id) {
     throw std::runtime_error(av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, error_id));
 }
 
-static void save_frame(AVFrame* frame) {
-    unsigned char *buf = (unsigned char*)frame->data[0];
-    int wrap = frame->linesize[0];
-    int xs = frame->width;
-    int ys = frame->height;
-    std::cout << xs << ": " << ys << std::endl;
-    const char *filename = "one_frame.pbm";
-
-    FILE *f;
-    f = fopen(filename,"w");
-
-    fprintf(f, "P5\n%d %d\n%d\n", xs, ys, 255);
-
-    int i = 0;
-    for (i = 0; i < ys; i++)
-        fwrite(buf + i * wrap, 1, xs, f);
-    fclose(f);
-}
-
 void defineResolutions(std::map<std::string, std::pair<int, int>> &resolutions) {
     resolutions["144p"] = {256, 144};
     resolutions["240p"] = {426, 240};
@@ -53,7 +34,7 @@ int main(int argc, char* argv[]) {
     defineResolutions(resolutions);
 
     if (argc < 6) {
-        throw std::runtime_error("Too few arg for main.");
+        throw std::runtime_error("Too few args for main.");
     }
 
     std::vector<std::string> arg_mas;
