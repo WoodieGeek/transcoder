@@ -17,6 +17,7 @@ public:
     std::vector<std::pair<AVFrame*, int>> ReadFrame();
     std::vector<AVStream*> GetStreams();
 private:
+    void Seek(int);
     std::string file_name;
     AVFormatContext* in_format_ctx = nullptr;
 

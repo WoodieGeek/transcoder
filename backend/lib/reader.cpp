@@ -17,12 +17,24 @@ Reader::Reader(std::string file_name, int l, int r): LEFT(l), RIGHT(r) {
         std::cout << "Failed to open input file " << file_name << "!\n";
         ensure(ret);
     }
+
+    Seek(LEFT);
     for (int i = 0; i < in_format_ctx->nb_streams; ++i) {
         decoder_mas.emplace_back(new Decoder(in_format_ctx->streams[i]));
     }
 
     stream_is_closed.resize(in_format_ctx->nb_streams, false);
     cnt_closed_streams = 0;
+}
+
+void Reader::Seek(int time) {
+    for (int stream_index = 0; stream_index < in_format_ctx->nb_streams; ++stream_index) {
+        int time_base = av_rescale_q(time * AV_TIME_BASE, AV_TIME_BASE_Q, in_format_ctx->streams[stream_index]->time_base);
+        int response_key = av_seek_frame(in_format_ctx, stream_index, time_base, AVSEEK_FLAG_BACKWARD);
+        if (response_key < 0) {
+            throw std::runtime_error("Error of seeking streams: process finished with incorrect exit code.");
+        }
+    }
 }
 
 std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
