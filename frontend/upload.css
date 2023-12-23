@@ -3,6 +3,27 @@ html {
   width: 100%;
 }
 
+body {
+    margin: 0;
+    min-width: 750px;
+}
+
+.main {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    font-size: 28px;
+    background-color: rgb(255, 85, 20);
+    color: white;
+    height: 50px;
+    padding: 10px;
+    padding-left: 0.3%;
+    min-width: 125px;
+    font-family: 'Arial', cursive;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
 button {
   background-color: rgb(255, 85, 20);
   border: none;
@@ -12,7 +33,7 @@ button {
   text-decoration: none;
   display: inline-block;
   margin-top: 10px;
-  font-family: 'Limelight', cursive;
+  font-family: 'Arial', cursive;
   font-size: 22px;
   border-radius: 15px;
   width: 400px;
@@ -26,8 +47,8 @@ form {
   border: 2px solid rgb(255, 85, 20);
   border-radius: 1em;
   background-color: rgb(255, 170, 140);
-  font-family: 'Limelight', cursive;
-  font-size: 14px;
+  font-family: 'Arial', cursive;
+  font-size: 16px;
   color: black;
 }
 
@@ -40,7 +61,7 @@ label {
 
 input,
 textarea {
-  font-family: 'Limelight', cursive;
+  font-family: 'Arial', cursive;
 
   width: 300px;
   box-sizing: border-box;
@@ -58,6 +79,6 @@ textarea {
 
 button:hover {
   background-color: rgb(210, 40, 0);
-  font-family: 'Limelight', cursive;
+  font-family: 'Arial', cursive;
   transition: 0.5s all;
 }
