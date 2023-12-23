@@ -54,7 +54,7 @@ def upload_file():
     my_json = json.load(json_file)
     my_json['videos'].append({'name': title,
                               'description': description,
-                              'manifest_url': 'http://127.0.0.1:5000/play/' + filename[:4] + ".m3u8"})
+                              'manifest_url': 'http://127.0.0.1:5000/play/' + filename.split('.')[0] + ".m3u8"})
     with open(name, 'w') as fp:
         json.dump(my_json, fp)
     full_video = "storage/"+filename
