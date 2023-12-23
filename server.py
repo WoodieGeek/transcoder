@@ -4,9 +4,8 @@ import json
 import os
 from flask import send_from_directory
 from moviepy.editor import VideoFileClip
-import datetime
 import subprocess
-import concurrent.futures
+import multiprocessing
 
 app = Flask(__name__)
 
@@ -22,8 +21,8 @@ def get():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-def run_cpp(input_file, output_file, start_pos, end_pos):
-    subprocess.run("main", input_file, output_file, start_pos, end_pos)
+def run_cpp(input_file, output_file, start_pos, end_pos, kach):
+    subprocess.run(["./main", input_file, output_file, start_pos, end_pos, kach])
 
 
 @app.route('/upload', methods=['POST'])
@@ -42,29 +41,37 @@ def upload_file():
                               'manifest_url': 'http://127.0.0.1:5000/play/' + filename})
     with open(name, 'w') as fp:
         json.dump(my_json, fp)
-
-    full_video = name
+    full_video = "storage/"+filename
     full_duration = VideoFileClip(full_video).duration
     parts = 2
     part_duration = full_duration/parts
     start_pos = 0
     index = 1
-    query = []
+    query_full_video = []
+    query_part_name = []
+    query_start_pos = []
+    query_end_pos = []
     while (True) :
         end_pos = start_pos+part_duration
         if end_pos > full_duration:
             end_pos = full_duration
-        part_name = "part_"+str(index)+".mp4"
-        os.makedirs('part_name')
-        query.append({full_video, part_name, start_pos, end_pos})
+        part_name = "part"+str(index)+".ts"
+        query_full_video.append(full_video)
+        query_part_name.append(part_name)
+        st = str(start_pos)
+        en = str(end_pos)
+        query_start_pos.append(st)
+        query_end_pos.append(en)
         start_pos = end_pos
         index += 1
         if start_pos >= full_duration:
             break
+    event = []
+    for ind in range(parts):
+        process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p"))
+        process.start()
+        # run_cpp(query_full_video[ind], query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p")
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.submit(run_cpp, full_video, part_name, start_pos, end_pos)
-        file.save(os.path.join('storage', part_name))
     response = make_response("uploaded")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
