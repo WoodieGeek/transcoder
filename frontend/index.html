@@ -6,6 +6,7 @@
     <meta name = "viewport" content = "width=device-width">
     <title> Index </title>
     <link href = "index.css" rel = "stylesheet" type = "text/css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
@@ -15,11 +16,15 @@
         <table class = "table"> </table>
     </div>
 
-    <a href = "upload.html"> 
-        <div class = "load"> Load </div>
-    </a>
+ 
+    <div class = "load"> 
+        <a class = "load-text" href = "upload.html"> Load </a>
+    </div>
 
-    <script src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"> </script>
+    <div id = "video-player"> </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"> </script>
     <script src = "index.js"> </script>
 </body>
 

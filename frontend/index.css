@@ -19,7 +19,7 @@ body {
     padding: 10px;
     padding-left: 0.3%;
     min-width: 125px;
-    font-family: 'Limelight', cursive;
+    font-family: 'Arial', cursive;
     text-align: center;
 }
 
@@ -27,21 +27,28 @@ a {
     text-decoration: none;
 }
 
+.load-text {
+    color: white;
+    font-size: 20px;
+    font-family: 'Arial', cursive;
+    text-align: center;
+}
+
 .load {
     margin-left: auto;
     margin-right: auto;
     width: 150px;
-    font-size: 20px;
-    background-color: rgb(255, 85, 20);
     color: white;
+    font-size: 20px;
+    font-family: 'Arial', cursive;
+    text-align: center;
+    background-color: rgb(255, 85, 20);
     border-radius: 10px;
     height: 30px;
     padding: 10px;
     padding-left: 0.3%;
     margin-top: 15px; 
     min-width: 125px;
-    font-family: 'Limelight', cursive;
-    text-align: center;
     transition: 0.5s all;
 }
 
@@ -58,7 +65,7 @@ a {
     padding-left: 0.3%;
     margin-top: 15px; 
     min-width: 125px;
-    font-family: 'Limelight', cursive;
+    font-family: 'Arial', cursive;
     text-align: center;
     transition: 0.5s all;
 }
@@ -74,7 +81,7 @@ table {
 }
 
 .main {
-    font-family: 'Limelight', cursive;
+    font-family: 'Arial', cursive;
     font-size: 18px;
     color: black;
     font-weight: bold;
@@ -82,13 +89,13 @@ table {
 }
 
 .name {
-    font-family: 'Limelight', cursive;
+    font-family: 'Arial', cursive;
     font-size: 18px;
     color: black;
 }
 
 .description {
-    font-family: 'Limelight', cursive;
+    font-family: 'Arial', cursive;
     font-size: 14px;
     color: gray;
 }
@@ -100,7 +107,7 @@ td {
 }
 
 .table-link {
-    font-family: 'Limelight', cursive;
+    font-family: 'Arial', cursive;
     font-size: 18px;
     color: rgb(210, 40, 0);
     transition: 0.5s all;
@@ -109,4 +116,8 @@ td {
 .table-link:hover {
     color: rgb(255, 85, 20);
     transition: 0.5s all;
+}
+
+.video-player {
+    margin-top: 30px;
 }

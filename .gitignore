@@ -22,3 +22,4 @@ backend/lib/Makefile
 backend/lib/cmake_install.cmake
 backend/lib/liblib.a
 backend/main
+map.json
