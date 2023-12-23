@@ -102,8 +102,8 @@ def upload_file():
 
 def play(path):
     print(path)
-    if os.path.isfile('storage/processed/' + path) == True:
-        response = send_from_directory('storage/processed/', path)
+    if os.path.isfile(path) == True:
+        response = send_from_directory(path)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
     else:
