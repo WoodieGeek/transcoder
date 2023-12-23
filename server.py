@@ -75,7 +75,6 @@ def upload_file():
         # part_name = "part"+str(index)+".ts"
         query_full_video.append(full_video)
         query_part_name.append("storage/processed/")
-        query_part_name.append(part_name)
         query_time.append(end_pos-start_pos)
         st = str(start_pos)
         en = str(end_pos)
@@ -87,28 +86,28 @@ def upload_file():
             break
     manifest360 = []
     for ind in range(parts):
-        manifest360.append((query_part_name[ind], query_time[ind]))
+        manifest360.append((query_part_name[ind]+"360.ts", query_time[ind]))
         process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind]+"360.ts", query_start_pos[ind], query_end_pos[ind], "360p"))
         process.start()
-    manifest_generate(filename.split('.')[0], manifest360)
+    manifest_generate(("360").split('.')[0], manifest360)
     manifest480 = []
     for ind in range(parts):
-        manifest480.append((query_part_name[ind], query_time[ind]))
+        manifest480.append((query_part_name[ind]+"480.ts", query_time[ind]))
         process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind]+"480.ts", query_start_pos[ind], query_end_pos[ind], "480p"))
         process.start()
-    manifest_generate(filename.split('.')[0], manifest480)
+    manifest_generate(("480").split('.')[0], manifest480)
     manifest720 = []
     for ind in range(parts):
-        manifest720.append((query_part_name[ind], query_time[ind]))
+        manifest720.append((query_part_name[ind]+"720.ts", query_time[ind]))
         process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind]+"720.ts", query_start_pos[ind], query_end_pos[ind], "720p"))
         process.start()
-    manifest_generate(filename.split('.')[0], manifest720)
+    manifest_generate(("720").split('.')[0], manifest720)
     manifest1080 = []
     for ind in range(parts):
-        manifest1080.append((query_part_name[ind], query_time[ind]))
+        manifest1080.append((query_part_name[ind]+"1080.ts", query_time[ind]))
         process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind]+"1080.ts", query_start_pos[ind], query_end_pos[ind], "1080p"))
         process.start()
-    manifest_generate(filename.split('.')[0], manifest1080)
+    manifest_generate(("1080").split('.')[0], manifest1080)
     response = make_response("uploaded")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
