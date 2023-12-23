@@ -18,9 +18,39 @@
     <a href = "upload.html"> 
         <div class = "load"> Load </div>
     </a>
-
+        
+    <div id="video-player"></div>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"> </script>
-    <script src = "index.js"> </script>
+    <script>
+        playVideo("http://127.0.0.1:5000/play/test.m3u8");
+ 
+ 
+        function playVideo(url) {
+	  const videoPlayerContainer = document.getElementById("video-player");
+	  videoPlayerContainer.innerHTML = ""; // Clear previous video
+ 
+	  const video = document.createElement("video");
+	  video.controls = true;
+	  videoPlayerContainer.appendChild(video);
+ 
+	  if (Hls.isSupported()) {
+	    const hls = new Hls();
+	    hls.loadSource(url);
+	    hls.attachMedia(video);
+	    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+	      video.play();
+	    });
+	  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+	    video.src = url;
+	    video.addEventListener("loadedmetadata", function () {
+	      video.play();
+	    });
+	  } else {
+	    console.error("HLS playback is not supported in this browser.");
+	  }
+	}
+    </script>
 </body>
 
 </html>
