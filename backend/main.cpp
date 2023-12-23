@@ -34,11 +34,11 @@ int main(int argc, char* argv[]) {
     defineResolutions(resolutions);
 
     if (argc < 6) {
-        throw std::runtime_error("Too few args for main.");
+        throw std::runtime_error("Not enough args for main.");
     }
 
     std::vector<std::string> arg_mas;
-    for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]), std::cout << arg_mas[i] << std::endl;
+    for (int i = 0; i < argc; ++i) arg_mas.emplace_back(argv[i]);
 
     const char* input_file = arg_mas[1].c_str();
     const char* output_file = arg_mas[2].c_str();

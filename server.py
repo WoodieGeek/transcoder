@@ -56,7 +56,7 @@ def upload_file():
     with open(name, 'w') as fp:
         json.dump(my_json, fp)
 
-    manifest_generate(filename[:4], [('storage/processed/out1.ts', 9)])
+    manifest_generate(filename[:4], [('out1.ts', 9)])
     response = make_response("uploaded")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
