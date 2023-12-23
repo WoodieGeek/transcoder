@@ -72,10 +72,10 @@ def play(path):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
     else:
-
         print("No such file")
-        return flask.make_response("404 not found", 404)
-
+        response = flask.make_response("404 not found", 404)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
         
 
