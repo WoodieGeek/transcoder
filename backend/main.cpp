@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
     defineResolutions(resolutions);
 
     if (argc < 6) {
-        throw std::runtime_error("Too few arg for main.");
+        throw std::runtime_error("Too few args for main.");
     }
 
     std::vector<std::string> arg_mas;
