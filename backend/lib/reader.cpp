@@ -83,8 +83,12 @@ std::vector<std::pair<AVFrame*, int>> Reader::ReadFrame() {
     std::vector<std::pair<AVFrame*, int>> returning_frames;
     returning_frames.reserve(get_frames.size());
 
+    if (start == get_frames.size()) {
+        return {};
+    }
+
+    get_frames[start].first->key_frame = 1;
     for (int i = start; i < get_frames.size(); ++i) {
-        get_frames[i].first->key_frame = 1;
         returning_frames.emplace_back(get_frames[i]);
     }
 
