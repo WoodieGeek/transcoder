@@ -2,7 +2,7 @@ from flask import Flask, request, make_response
 import flask
 import json
 import os
-from flask import send_from_directory
+from flask import send_file
 from moviepy.editor import VideoFileClip
 import datetime
 import subprocess
@@ -54,7 +54,7 @@ def upload_file():
     my_json = json.load(json_file)
     my_json['videos'].append({'name': title,
                               'description': description,
-                              'manifest_url': 'http://127.0.0.1:5000/play/' + filename[:4] + ".m3u8"})
+                              'manifest_url': 'http://127.0.0.1:5000/play/storage/processed/' + filename.split('.')[0] + ".m3u8"})
     with open(name, 'w') as fp:
         json.dump(my_json, fp)
     full_video = "storage/"+filename
@@ -74,7 +74,11 @@ def upload_file():
             end_pos = full_duration
         # part_name = "part"+str(index)+".ts"
         query_full_video.append(full_video)
+<<<<<<< HEAD
         query_part_name.append("storage/processed/")
+=======
+        query_part_name.append(part_name)
+>>>>>>> refs/remotes/origin/main
         query_time.append(end_pos-start_pos)
         st = str(start_pos)
         en = str(end_pos)
@@ -86,6 +90,7 @@ def upload_file():
             break
     manifest360 = []
     for ind in range(parts):
+<<<<<<< HEAD
         manifest360.append((query_part_name[ind], query_time[ind]))
         process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind]+"360.ts", query_start_pos[ind], query_end_pos[ind], "360p"))
         process.start()
@@ -108,25 +113,32 @@ def upload_file():
         process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind]+"1080.ts", query_start_pos[ind], query_end_pos[ind], "1080p"))
         process.start()
     manifest_generate(filename[:4], manifest1080)
+=======
+        manifest.append((query_part_name[ind], query_time[ind]))
+        process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], "storage/processed/" + query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p"))
+        process.start()
+        # run_cpp(query_full_video[ind], query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p")
+    manifest_generate(filename.split('.')[0], manifest)
+>>>>>>> refs/remotes/origin/main
     response = make_response("uploaded")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
 
 
-@app.route('/play/<path:path>')
+@app.route('/play/<path:pth>')
 
-def play(path):
-    print(path)
-    if os.path.isfile('storage/processed/' + path) == True:
-        response = send_from_directory('storage/processed/', path)
+def play(pth):
+    print(pth)
+    if os.path.isfile(pth) == True:
+        response = send_file(pth)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
     else:
-
         print("No such file")
-        return flask.make_response("404 not found", 404)
-
+        response = flask.make_response("404 not found", 404)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
         
 
