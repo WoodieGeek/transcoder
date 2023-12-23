@@ -2,7 +2,6 @@ var $table = $('.table');
 
 async function playVideo(url) {
     const videoPlayerContainer = document.getElementById("video-player");
-    console.log(videoPlayerContainer);
     videoPlayerContainer.innerHTML = ""; // Clear previous video
     
     const video = document.createElement("video");
@@ -44,10 +43,14 @@ async function buildTable() {
     data = data["videos"];
     for (var i = 0; i < data.length; ++i) {
         $table.append('<tr> <td class = "name">' + data[i].name + '</td> <td class = "description">' + data[i].description + '</td> <td> <a href = ' + data[i].manifest_url + ' class = "table-link"> Link </a> </td> </tr>');
-
-	console.log(data[i].manifest_url);
-        $table[$table.length - 1].addEventListener('click', () => {
-            playVideo(data[$table.length - 1].manifest_url);
+    }
+    
+    var lines = document.getElementsByTagName("tr");
+    for (let i = 1; i < lines.length; ++i) {
+    	lines[i].addEventListener('click', () => {
+            console.log(this)
+            console.log(i - 1);
+            playVideo(data[i - 1].manifest_url);
         });
     }
 }
