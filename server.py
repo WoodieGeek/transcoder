@@ -2,7 +2,7 @@ from flask import Flask, request, make_response
 import flask
 import json
 import os
-from flask import send_from_directory
+from flask import send_file
 from moviepy.editor import VideoFileClip
 import datetime
 import subprocess
@@ -54,7 +54,7 @@ def upload_file():
     my_json = json.load(json_file)
     my_json['videos'].append({'name': title,
                               'description': description,
-                              'manifest_url': 'http://127.0.0.1:5000/play/' + filename.split('.')[0] + ".m3u8"})
+                              'manifest_url': 'http://127.0.0.1:5000/play/storage/processed/' + filename.split('.')[0] + ".m3u8"})
     with open(name, 'w') as fp:
         json.dump(my_json, fp)
     full_video = "storage/"+filename
@@ -74,7 +74,7 @@ def upload_file():
             end_pos = full_duration
         part_name = "part"+str(index)+".ts"
         query_full_video.append(full_video)
-        query_part_name.append("storage/processed/"+part_name)
+        query_part_name.append(part_name)
         query_time.append(end_pos-start_pos)
         st = str(start_pos)
         en = str(end_pos)
@@ -98,12 +98,12 @@ def upload_file():
 
 
 
-@app.route('/play/<path:path>')
+@app.route('/play/<path:pth>')
 
-def play(path):
-    print(path)
-    if os.path.isfile(path) == True:
-        response = send_from_directory(path)
+def play(pth):
+    print(pth)
+    if os.path.isfile(pth) == True:
+        response = send_file(pth)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
     else:
