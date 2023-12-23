@@ -10,8 +10,11 @@ async function playVideo(url) {
     
     if (Hls.isSupported()) {
         const hls = new Hls();
+        console.log(url);
         hls.loadSource(url);
+        console.log(url);
         hls.attachMedia(video);
+        console.log(url);
         hls.on(Hls.Events.MANIFEST_PARSED, function () {
           video.play();
         });
