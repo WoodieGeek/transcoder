@@ -47,6 +47,8 @@ def upload_file():
     title = request.form['title']
     if not os.path.exists('storage'):
         os.makedirs('storage')
+    if not os.path.exists('storage/processed'):
+        os.makedirs('storage/processed')
     file.save(os.path.join('storage', filename))
     json_file = open(name, 'r')
     my_json = json.load(json_file)
@@ -65,13 +67,15 @@ def upload_file():
     query_part_name = []
     query_start_pos = []
     query_end_pos = []
+    query_time = []
     while (True) :
         end_pos = start_pos+part_duration
         if end_pos > full_duration:
             end_pos = full_duration
         part_name = "part"+str(index)+".ts"
         query_full_video.append(full_video)
-        query_part_name.append(part_name)
+        query_part_name.append("storage/processed/"+part_name)
+        query_time.append(end_pos-start_pos)
         st = str(start_pos)
         en = str(end_pos)
         query_start_pos.append(st)
@@ -81,12 +85,13 @@ def upload_file():
         if start_pos >= full_duration:
             break
     event = []
+    manifest = []
     for ind in range(parts):
+        manifest.append((query_part_name[ind], query_time[ind]))
         process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p"))
         process.start()
         # run_cpp(query_full_video[ind], query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p")
-
-    manifest_generate(filename[:4], [('out1.ts', 9)])
+    manifest_generate(filename[:4], manifest)
     response = make_response("uploaded")
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
