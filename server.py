@@ -88,7 +88,7 @@ def upload_file():
     manifest = []
     for ind in range(parts):
         manifest.append((query_part_name[ind], query_time[ind]))
-        process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p"))
+        process = multiprocessing.Process(target=run_cpp, args=(query_full_video[ind], "storage/processed/" + query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p"))
         process.start()
         # run_cpp(query_full_video[ind], query_part_name[ind], query_start_pos[ind], query_end_pos[ind], "720p")
     manifest_generate(filename.split('.')[0], manifest)
